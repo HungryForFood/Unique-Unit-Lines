@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Deploy" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Default</Configuration>
+    <ProjectGuid>{0e0f08e8-bdad-45b1-af61-3f5d7661fc16}</ProjectGuid>
+    <Name>Unique Unit Lines</Name>
+    <Guid>f9d1f547-168f-40a4-93b7-2a0adc9967b9</Guid>
+    <ModVersion>1</ModVersion>
+    <Stability>Stable</Stability>
+    <Teaser>
+    [ICON_BULLET]Applies unique promotions from a unique unit to the whole unit line for the civilization.
+    [NEWLINE][ICON_BULLET]Requires the [COLOR_HIGHLIGHT_TEXT]Community Patch[ENDCOLOR] or [COLOR_HIGHLIGHT_TEXT]WHoward's DLL[ENDCOLOR].
+    </Teaser>
+    <Description>
+    [ICON_BULLET]Applies unique promotions from a unique unit to the whole unit line for the civilization.
+    [NEWLINE][ICON_BULLET]Requires the [COLOR_HIGHLIGHT_TEXT]Community Patch[ENDCOLOR] or [COLOR_HIGHLIGHT_TEXT]WHoward's DLL[ENDCOLOR].
+    </Description>
+    <Authors>HungryForFood</Authors>
+    <SpecialThanks>
+    </SpecialThanks>
+    <AffectsSavedGames>true</AffectsSavedGames>
+    <MinCompatibleSaveVersion>0</MinCompatibleSaveVersion>
+    <SupportsSinglePlayer>true</SupportsSinglePlayer>
+    <SupportsMultiplayer>true</SupportsMultiplayer>
+    <SupportsHotSeat>true</SupportsHotSeat>
+    <SupportsMac>true</SupportsMac>
+    <AssemblyName>Unique Unit Line</AssemblyName>
+    <RootNamespace>Unique Unit Line</RootNamespace>
+    <ModReferences>
+      <Association>
+        <Type>Mod</Type>
+        <Name>(2) Community Balance Overhaul</Name>
+        <Id>8411a7a8-dad3-4622-a18e-fcc18324c799</Id>
+        <MinVersion>0</MinVersion>
+        <MaxVersion>999</MaxVersion>
+      </Association>
+      <Association>
+        <Type>Mod</Type>
+        <Name>(7a) Promotion Icons for VP</Name>
+        <Id>0f1eab20-b84e-4277-a3cc-f772b952be54</Id>
+        <MinVersion>0</MinVersion>
+        <MaxVersion>999</MaxVersion>
+      </Association>
+    </ModReferences>
+    <ModDependencies>
+      <Association xmlns="">
+        <Type>Mod</Type>
+        <Name>(1) Community Patch</Name>
+        <Id>d1b6328c-ff44-4b0d-aad7-c657f83610cd</Id>
+        <MinVersion>0</MinVersion>
+        <MaxVersion>999</MaxVersion>
+      </Association>
+    </ModDependencies>
+    <ModContent>
+      <Content>
+        <Type>InGameUIAddin</Type>
+        <Name>UniqueUnitLine_Functions</Name>
+        <Description>UniqueUnitLine_Functions</Description>
+        <FileName>Lua/UniqueUnitLines_Functions.lua</FileName>
+      </Content>
+    </ModContent>
+    <ModActions>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>Core/UniqueUnitLines_GameDefines.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>Core/UniqueUnitLines_GameText.xml</FileName>
+      </Action>
+    </ModActions>
+    <ReloadUnitSystem>true</ReloadUnitSystem>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Default' ">
+    <OutputPath>.</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Package Only' ">
+    <PackageMod>true</PackageMod>
+    <DeployMod>false</DeployMod>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Deploy Only' ">
+    <PackageMod>false</PackageMod>
+    <DeployMod>true</DeployMod>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Lua" />
+    <Folder Include="Lua\Utilities" />
+    <Folder Include="Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Changes.txt">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="Core\UniqueUnitLines_GameDefines.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="Core\UniqueUnitLines_GameText.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="Lua\UniqueUnitLines_Functions.lua">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="Lua\Utilities\UniqueUnitLines_Utilities.lua">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Firaxis\ModBuddy\Civ5Mod.targets" />
+</Project>

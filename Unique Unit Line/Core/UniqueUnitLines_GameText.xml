@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created by ModBuddy on 3/25/2020 4:23:45 PM -->
+<GameData>
+	<Language_en_US>
+		<Row Tag="TXT_KEY_PROMOTION_BYZANTINE_IMMOBILITY">
+			<Text>Laden Immobility</Text>
+		</Row>
+		<Row Tag="TXT_KEY_PROMOTION_BYZANTINE_IMMOBILITY_HELP">
+			<Text>-1 [ICON_MOVES] Movement.</Text>
+		</Row>
+	</Language_en_US>
+</GameData>
