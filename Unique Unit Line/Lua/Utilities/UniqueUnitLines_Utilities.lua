@@ -74,6 +74,11 @@ function Unit_GetUnitLine(sCombatClass, bMounted)
 		sUnitLine = "Settler"
 	elseif sCombatClass == "UNITCOMBAT_DIPLOMACY" then
 		sUnitLine = "Diplomat"
+	---- air units last, they are the rarest
+	elseif sCombatClass == "UNITCOMBAT_FIGHTER" then
+		sUnitLine = "Fighter"
+	elseif sCombatClass == "UNITCOMBAT_BOMBER" then
+		sUnitLine = "Bomber"
 	elseif sCombatClass == "UNITCOMBAT_HELICOPTER" then -- unused in VP
 		sUnitLine = "Helicopter"
 	---- if its a combat class we did not expect, then just use the combat class type
