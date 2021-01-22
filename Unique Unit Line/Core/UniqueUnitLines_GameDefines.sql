@@ -7,6 +7,19 @@ UPDATE CustomModOptions
 SET Value = 1
 WHERE Name IN('EVENTS_UNIT_CREATED', 'EVENTS_UNIT_CONVERTS');
 --==========================================================================================================================
+-- COMMUNITY
+--==========================================================================================================================
+-- COMMUNITY -- why is this table in all caps...
+------------------------------
+/*
+Require the unique unit tech to be unlocked before granting the unique unit promotions
+1 = Enabled (Default)
+0 = Disabled 
+*/
+INSERT INTO COMMUNITY
+		(Type, Value)
+VALUES	('UNIQUE_UNIT_LINES_REQUIRE_TECH', 1);
+--==========================================================================================================================
 -- UNITS
 --==========================================================================================================================
 -- Units

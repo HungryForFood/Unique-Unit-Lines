@@ -11,9 +11,11 @@ include("UniqueUnitLines_Utilities.lua")
 --=======================================================================================================================
 ------------------------------------------------------------------------------------------------------------------------
 local g_TableInsert = table.insert
---local g_bDebug = false
 -- exceptions for promotions which may be too overpowered early on
-local g_tDisallowedPromotionsToGive = {"PROMOTION_RECON_BANDEIRANTES"} -- to use, just add to this table, eg: {Promotion A, Promotion B, etc}
+local g_tDisallowedPromotionsToGive = {} -- to use, just add to this table, eg: {"Promotion A", "Promotion B", etc}
+if g_bRequireTech == true then
+	g_TableInsert(g_tDisallowedPromotionsToGive, "PROMOTION_RECON_BANDEIRANTES") -- the Bandeirantes yields are just far too much for early game
+end
 --=======================================================================================================================
 -- GAMES DEFINES
 --=======================================================================================================================
@@ -49,7 +51,6 @@ function UniqueUnitLines_SequenceGameInitComplete()
 					local sUniqueUnit = tUniqueUnit.UnitType
 					local sDefaultUnit = tUniqueUnit.DefaultUnit
 					local sCombatClass = tUniqueUnit.CombatClass
-
 					local bMounted = false
 					if tUniqueUnit.IsMounted > 0 then
 						bMounted = true
@@ -61,6 +62,18 @@ function UniqueUnitLines_SequenceGameInitComplete()
 						-- cache the unique unit promotions
 						if tUniqueUnitLinesPromotions[sUnitLine] == nil then
 							tUniqueUnitLinesPromotions[sUnitLine] = {}
+						end
+						
+						---- prerequisite tech, not doing this in the first query as we want the unique unit's tech rather than the default unit's tech
+						local sPrereqTech = nil
+						local iPrereqTech = nil
+						if g_bRequireTech == true then
+							for tUniqueUnitTech in DB.Query("SELECT PrereqTech FROM Units WHERE Type = \"" .. sUniqueUnit .. "\";") do
+								sPrereqTech = tUniqueUnitTech.PrereqTech
+							end
+							if sPrereqTech ~= nil and sPrereqTech ~= "" then
+								iPrereqTech = GameInfoTypes[sPrereqTech]
+							end
 						end
 						
 						---- disallowed promotions
@@ -80,7 +93,7 @@ function UniqueUnitLines_SequenceGameInitComplete()
 						sQuery = sQuery .. ";"
 						
 						for tUniquePromotion in DB.Query(sQuery) do
-							g_TableInsert(tUniqueUnitLinesPromotions[sUnitLine], tUniquePromotion.ID)
+							g_TableInsert(tUniqueUnitLinesPromotions[sUnitLine], {tUniquePromotion.ID, iPrereqTech})
 						end
 						
 						
@@ -91,7 +104,7 @@ function UniqueUnitLines_SequenceGameInitComplete()
 						
 						sQuery = "SELECT p.ID FROM Unit_FreePromotions fp, UnitPromotions p WHERE UnitType = \"".. sDefaultUnit .."\" AND PromotionType NOT IN(SELECT PromotionType FROM Unit_FreePromotions WHERE UnitType = \"".. sUniqueUnit .."\") AND p.Type = fp.PromotionType;"
 						for tDefaultPromotion in DB.Query(sQuery) do
-							g_TableInsert(tDefaultUnitLinePromotions[sUnitLine], tDefaultPromotion.ID)
+							g_TableInsert(tDefaultUnitLinePromotions[sUnitLine], {tDefaultPromotion.ID, iPrereqTech})
 						end
 					end
 				end
@@ -125,5 +138,22 @@ function UniqueUnitLines_UnitConverted(iOldPlayer, iNewPlayer, iOldUnit, iNewUni
 	Unit_DoUniqueUnitLinePromotions(iNewPlayer, iNewUnit, g_tPromotionsToAdd[iNewPlayer], g_tPromotionsToRemove[iNewPlayer])
 end
 GameEvents.UnitConverted.Add(UniqueUnitLines_UnitConverted) -- this covers everything that the UnitCreated hook doesn't, eg upgrades and barbarian captures
+-------------------------------------------------------------------------------------------------------------------------
+-- TECHNOLOGY RESEARCHED
+-------------------------------------------------------------------------------------------------------------------------
+function UniqueUnitLines_TeamTechResearched(iTeam, iTech, iChange)
+	if iChange > 0 then
+		for iPlayer = 0, iMaxMajorCivs - 1 do
+			local pPlayer = Players[iPlayer]
+			if pPlayer:IsEverAlive() and pPlayer:GetTeam() == iTeam then
+				for pUnit in pPlayer:Units() do
+					local iUnit = pUnit:GetID()
+					Unit_DoUniqueUnitLinePromotions(iPlayer, iUnit, g_tPromotionsToAdd[iPlayer], g_tPromotionsToRemove[iPlayer])
+				end
+			end
+		end
+	end
+end
+GameEvents.TeamTechResearched.Add(UniqueUnitLines_TeamTechResearched) -- when researchiug the unique unit's technology
 --==========================================================================================================================
 --==========================================================================================================================

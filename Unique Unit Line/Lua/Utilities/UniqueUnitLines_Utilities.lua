@@ -7,6 +7,17 @@ if (not GameInfo) then return end
 -- INCLUDES
 --=======================================================================================================================
 --=======================================================================================================================
+-- GLOBALS
+--=======================================================================================================================
+------------------------------------------------------------------------------------------------------------------------
+-- do we consider if we have unlocked the unique unit before granting the its promotions?
+g_bRequireTech = false
+for tRequireTech in DB.Query("SELECT Value FROM COMMUNITY WHERE Type = \"UNIQUE_UNIT_LINES_REQUIRE_TECH\"") do
+	if tRequireTech.Value == 1 then
+		g_bRequireTech = true
+	end
+end
+--=======================================================================================================================
 -- CACHED TABLES
 --=======================================================================================================================
 -------------------------------------------------------------------------------------------------------------------------
@@ -30,6 +41,8 @@ end
 local iCivilizationBarbarian = GameInfoTypes["CIVILIZATION_BARBARIAN"]
 local iCivilizationMinor = GameInfoTypes["CIVILIZATION_MINOR"]
 local iCivilizationByzantium = GameInfoTypes["CIVILIZATION_BYZANTIUM"]
+
+local iTechChivalry = GameInfoTypes["TECH_CHIVALRY"]
 
 local iPromotionSmallCityPenalty = GameInfoTypes["PROMOTION_SMALL_CITY_PENALTY"]
 
@@ -92,6 +105,7 @@ end
 
 function Unit_DoUniqueUnitLinePromotions(iPlayer, iUnit, tPromotionsToAdd, tPromotionsToRemove)
 	local pPlayer = Players[iPlayer]
+	local pTeam = Teams[pPlayer:GetTeam()]
 	local iCivilization = pPlayer:GetCivilizationType()
 	if iCivilization == iCivilizationBarbarian or iCivilization == iCivilizationMinor then return end
 
@@ -108,21 +122,25 @@ function Unit_DoUniqueUnitLinePromotions(iPlayer, iUnit, tPromotionsToAdd, tProm
 	if sUnitLine ~= nil then
 		-- add unique promotions
 		if tPromotionsToAdd[sUnitLine] ~= nil then
-			for i, iPromotion in ipairs(tPromotionsToAdd[sUnitLine]) do
-				pUnit:SetHasPromotion(iPromotion, true)
+			for i, tPromotion in ipairs(tPromotionsToAdd[sUnitLine]) do
+				if tPromotion[2] == nil or tPromotion[2] == "" or tPromotion[2] == -1 or pTeam:IsHasTech(tPromotion[2]) then
+					pUnit:SetHasPromotion(tPromotion[1], true)
+				end
 			end
 		end
 		
 		-- remove default promotions
 		if tPromotionsToRemove[sUnitLine] ~= nil then
-			for i, iPromotion in ipairs(tPromotionsToRemove[sUnitLine]) do
-				pUnit:SetHasPromotion(iPromotion, false)
+			for i, tPromotion in ipairs(tPromotionsToRemove[sUnitLine]) do
+				if tPromotion[2] == nil or tPromotion[2] == "" or tPromotion[2] == -1 or pTeam:IsHasTech(tPromotion[2]) then
+					pUnit:SetHasPromotion(tPromotion[1], false)
+				end
 			end
 		end
 		
 		-- special cases are below
 		---- Byzantium mounted units, but not armour units, has a -25% malus against cities rather than the standard -33%, and is lost on upgrade
-		if iCivilization == iCivilizationByzantium and iCombatClass == iCombatClassMounted then
+		if iCivilization == iCivilizationByzantium and iCombatClass == iCombatClassMounted and pTeam:IsHasTech(iTechChivalry) then
 			pUnit:SetHasPromotion(iPromotionSmallCityPenalty, true)
 		end
 	end

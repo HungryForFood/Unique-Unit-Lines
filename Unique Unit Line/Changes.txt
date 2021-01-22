@@ -7,3 +7,8 @@ v1
 v2
 --------------------------------------------------------------
 - Added missing support for air units.
+
+--------------------------------------------------------------
+v3
+--------------------------------------------------------------
+- Promotions are now only granted if the technology unlocking the unique unit has been researched. Can be disabled by changing UNIQUE_UNIT_LINES_REQUIRE_TECH in UniqueUnitLines_GameDefines.sql.
